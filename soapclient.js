@@ -287,9 +287,9 @@ SOAPClient._onSendSoapRequest = function(method, async, callback, wsdl, req)
         if(req.responseXML.getElementsByTagName("faultcode").length > 0)
         {
             if(async || callback)
-                o = new Error(500, req.responseXML.getElementsByTagName("faultstring")[0].childNodes[0].nodeValue);
+                o = new Error(req.responseXML.getElementsByTagName("faultstring")[0].childNodes[0].nodeValue, 500);
             else
-                throw new Error(500, req.responseXML.getElementsByTagName("faultstring")[0].childNodes[0].nodeValue);
+                throw new Error(req.responseXML.getElementsByTagName("faultstring")[0].childNodes[0].nodeValue, 500);
         }
     }
     else
