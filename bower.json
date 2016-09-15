@@ -1,9 +1,10 @@
 {
-  "name": "angular-soap",
-  "version": "2.1.1",
+  "name": "angular-soap-d",
+  "version": "2.1.3",
   "homepage": "https://github.com/andrewmcgivery/angular-soap",
   "authors": [
-    "andrewmcgivery <andrew@mcgivery.com>"
+    "andrewmcgivery <andrew@mcgivery.com>",
+    "vadimmaltsev <vadim.maltsev001@gmail.com>"
   ],
   "description": "An angular port of a Javascript SOAP Client into a factory that has a similar syntax to $http.",
   "main": ["soapclient.js","angular.soap.js"],

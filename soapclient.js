@@ -54,20 +54,20 @@ function SOAPClientParameters()
         return list.join(' ');
     }
 }
-SOAPClientParameters._serialize = function(t, o)
+SOAPClientParameters._serialize = function(t, o, addTypeInfo)
 {
     var s = "";
     switch(typeof(o))
     {
         case "string":
-            s += "<" + t + ">";
+            s += "<" + t + (addTypeInfo?" xsi:type=\"soapenc:string\"":"")+ ">";
             s += o.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
             s += "</" + t + ">";
             break;
         case "number":
         case "boolean":
             s += "<" + t + ">";
-            s += o.toString(); 
+            s += o.toString();
             s += "</" + t + ">";
             break;
         case "object":
@@ -77,11 +77,11 @@ SOAPClientParameters._serialize = function(t, o)
 				s += "<" + t + "/>";
 				break;
 			}
-			
+
             // Date
             if(o.constructor.toString().indexOf("function Date()") > -1)
             {
-        
+
                 var year = o.getFullYear().toString();
                 var month = (o.getMonth() + 1).toString();
                 month = (month.length == 1) ? "0" + month : month;
@@ -111,8 +111,8 @@ SOAPClientParameters._serialize = function(t, o)
             // Array
             else if(o.constructor.toString().indexOf("function Array()") > -1)
             {
-				
-                s += "<" + t + " SOAP-ENC:arrayType=\"SOAP-ENC:Array[" + o.length + "]\" xsi:type=\"SOAP-ENC:Array\">";
+
+                s += "<" + t + " soapenc:arrayType=\"soapenc:Array[" + o.length + "]\" xsi:type=\"soapenc:Array\"  xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\">";
                 for(var p in o)
                 {
                     if(!isNaN(p))   // linear array
@@ -136,7 +136,7 @@ SOAPClientParameters._serialize = function(t, o)
                                 type = "DateTime";
                                 break;
                         }
-                        s += SOAPClientParameters._serialize("item", o[p]);
+                        s += SOAPClientParameters._serialize(t, o[p], true);
                     }
                     else    // associative array
                     {
@@ -192,16 +192,16 @@ SOAPClient._loadWsdl = function(url, method, parameters, async, callback)
     // get wsdl
     var xmlHttp = SOAPClient._getXmlHttp();
     if (SOAPClient.userName && SOAPClient.password){
-    	xmlHttp.open("GET", url + "?wsdl", async);
-    	// Some WS implementations (i.e. BEA WebLogic Server 10.0 JAX-WS) don't support Challenge/Response HTTP BASIC, so we send authorization headers in the first request
+        xmlHttp.open("GET", url + "?wsdl", async);
+        // Some WS implementations (i.e. BEA WebLogic Server 10.0 JAX-WS) don't support Challenge/Response HTTP BASIC, so we send authorization headers in the first request
         xmlHttp.setRequestHeader("Authorization", "Basic " + SOAPClient._toBase64(SOAPClient.userName + ":" + SOAPClient.password));
     }
     else {
-    	xmlHttp.open("GET", url + "?wsdl", async);
+        xmlHttp.open("GET", url + "?wsdl", async);
     }
     if (SOAPClient.cors) {
-    	xmlHttp.withCredentials = true;
-    	xmlHttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xmlHttp.withCredentials = true;
+        xmlHttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     }
     if(async)
     {
@@ -274,7 +274,7 @@ SOAPClient._sendSoapRequest = function(url, method, parameters, async, callback,
         return SOAPClient._onSendSoapRequest(method, async, callback, wsdl, xmlHttp);
 }
 
-SOAPClient._onSendSoapRequest = function(method, async, callback, wsdl, req) 
+SOAPClient._onSendSoapRequest = function(method, async, callback, wsdl, req)
 {
     var o = null;
     var nd = SOAPClient._getElementsByTagName(req.responseXML, method + "Result");
@@ -321,7 +321,7 @@ SOAPClient._node2object = function(node, wsdlTypes)
         if(typeof tmpNodeNameObject[node.childNodes[i].nodeName] == "undefined")
             tmpNodeNameObject[node.childNodes[i].nodeName] = true;
         else isArray = true;
-            
+
     }
     var isarray = isArray || SOAPClient._getTypeFromWsdl(node.nodeName, wsdlTypes).toLowerCase().indexOf("arrayof") != -1;
     // object node
@@ -423,7 +423,7 @@ SOAPClient._getElementsByTagName = function(document, tagName)
     return document.getElementsByTagName(tagName);
 }
 // private: xmlhttp factory
-SOAPClient._getXmlHttp = function() 
+SOAPClient._getXmlHttp = function()
 {
     try
     {
