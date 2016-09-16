@@ -1,4 +1,4 @@
-angular-soap
+angular-soap-d
 ============
 
 An Angular port of a <a href="http://javascriptsoapclient.codeplex.com/">JavaScript SOAP Client</a> into a factory that has a similar syntax to $http.
