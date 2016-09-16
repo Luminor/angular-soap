@@ -315,15 +315,7 @@ SOAPClient._node2object = function(node, wsdlTypes)
     // leaf node
     if (node.childNodes.length == 1 && (node.childNodes[0].nodeType == 3 || node.childNodes[0].nodeType == 4))
         return SOAPClient._node2object(node.childNodes[0], wsdlTypes);
-    var isArray = false;
-    var tmpNodeNameObject = new Object;
-    for(var i = 0; !isArray && i< node.childNodes.length; i++) {
-        if(typeof tmpNodeNameObject[node.childNodes[i].nodeName] == "undefined")
-            tmpNodeNameObject[node.childNodes[i].nodeName] = true;
-        else isArray = true;
-
-    }
-    var isarray = isArray || SOAPClient._getTypeFromWsdl(node.nodeName, wsdlTypes).toLowerCase().indexOf("arrayof") != -1;
+    var isarray = SOAPClient._getTypeFromWsdl(node.nodeName, wsdlTypes).toLowerCase().indexOf("arrayof") != -1;
     // object node
     if(!isarray)
     {
@@ -333,7 +325,20 @@ SOAPClient._node2object = function(node, wsdlTypes)
         for(var i = 0; i < node.childNodes.length; i++)
         {
             var p = SOAPClient._node2object(node.childNodes[i], wsdlTypes);
-            obj[node.childNodes[i].nodeName] = p;
+            // obj[node.childNodes[i].nodeName] = p;
+
+            if (obj[node.childNodes[i].nodeName]) {
+                if (obj[node.childNodes[i].nodeName].push) {
+                    obj[node.childNodes[i].nodeName].push(p);
+                }
+                else {
+                    var val = obj[node.childNodes[i].nodeName];
+                    obj[node.childNodes[i].nodeName] = new Array(val, p);
+                }
+            }
+            else {
+                obj[node.childNodes[i].nodeName] = p;
+            }
         }
         return obj;
     }
