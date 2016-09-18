@@ -8,7 +8,7 @@
  * Original work by Matteo Casati (based on v2.4 from 2007-12-21)
  * Improved by Gordon Tschirner (https://github.com/gtathub)
  * Licensed under GPLv2: https://github.com/gtathub/js-soap-client.git
-\*****************************************************************************/
+ \*****************************************************************************/
 
 function SOAPClientParameters()
 {
@@ -71,12 +71,12 @@ SOAPClientParameters._serialize = function(t, o, addTypeInfo)
             s += "</" + t + ">";
             break;
         case "object":
-			//	if the object is null just output an empty tag
-			if( o === null )
-			{
-				s += "<" + t + "/>";
-				break;
-			}
+            //	if the object is null just output an empty tag
+            if( o === null )
+            {
+                s += "<" + t + "/>";
+                break;
+            }
 
             // Date
             if(o.constructor.toString().indexOf("function Date()") > -1)
@@ -147,12 +147,12 @@ SOAPClientParameters._serialize = function(t, o, addTypeInfo)
             }
             // Object or custom function
             else
-			{
-				s += "<" + t + ">";
-				for(var p in o)
-					s += SOAPClientParameters._serialize(p, o[p]);
-				s += "</" + t + ">";
-			}
+            {
+                s += "<" + t + ">";
+                for(var p in o)
+                    s += SOAPClientParameters._serialize(p, o[p]);
+                s += "</" + t + ">";
+            }
             break;
         default:
             break; // throw new Error(500, "SOAPClientParameters: type '" + typeof(o) + "' is not supported");
@@ -223,27 +223,31 @@ SOAPClient._onLoadWsdl = function(url, method, parameters, async, callback, req)
 }
 SOAPClient._sendSoapRequest = function(url, method, parameters, async, callback, wsdl)
 {
+    if(typeof wsdl === "undefined" || wsdl === "" || wsdl === "undefined" || wsdl === null) {
+        callback(new Error('Connection problem'));
+        return null;
+    }
     // get namespace
     var ns = (typeof wsdl.documentElement.attributes["targetNamespace"] == "undefined") ? wsdl.documentElement.attributes.getNamedItem("targetNamespace").nodeValue : wsdl.documentElement.attributes["targetNamespace"].value;
     // build SOAP request
     var sr =
-    "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-    "<soap:Envelope " +
-    "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
-    "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
-    "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
-    (SOAPClient.explicitNS?"xmlns:tns=\"" + ns + "\"":"") +
-    parameters.printSchemaList() +
-    ">" +
-    (SOAPClient.auth?"<soap:Header><AuthHeader xmlns=\"" + ns + "\">" +
-    "<Username>"+SOAPClient.authUser+"</Username>" +
-    "<Password>"+SOAPClient.authPass+"</Password>" +
-    "</AuthHeader></soap:Header>":"") +
-    "<soap:Body>" +
-    (SOAPClient.explicitNS?"<tns:" + method + ">":"<" + method + " xmlns=\"" + ns + "\">") +
-    parameters.toXml() +
-    (SOAPClient.explicitNS?"</tns:" + method + ">":"</" + method + ">") +
-    "</soap:Body></soap:Envelope>";
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+        "<soap:Envelope " +
+        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+        "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
+        "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+        (SOAPClient.explicitNS?"xmlns:tns=\"" + ns + "\"":"") +
+        parameters.printSchemaList() +
+        ">" +
+        (SOAPClient.auth?"<soap:Header><AuthHeader xmlns=\"" + ns + "\">" +
+        "<Username>"+SOAPClient.authUser+"</Username>" +
+        "<Password>"+SOAPClient.authPass+"</Password>" +
+        "</AuthHeader></soap:Header>":"") +
+        "<soap:Body>" +
+        (SOAPClient.explicitNS?"<tns:" + method + ">":"<" + method + " xmlns=\"" + ns + "\">") +
+        parameters.toXml() +
+        (SOAPClient.explicitNS?"</tns:" + method + ">":"</" + method + ">") +
+        "</soap:Body></soap:Envelope>";
     // send request
     var xmlHttp = SOAPClient._getXmlHttp();
     if (SOAPClient.userName && SOAPClient.password){
@@ -258,8 +262,8 @@ SOAPClient._sendSoapRequest = function(url, method, parameters, async, callback,
     xmlHttp.setRequestHeader("SOAPAction", soapaction);
     xmlHttp.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
     if (SOAPClient.cors) {
-    	xmlHttp.withCredentials = true;
-    	xmlHttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xmlHttp.withCredentials = true;
+        xmlHttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     }
     if(async)
     {
@@ -499,7 +503,7 @@ SOAPClient._toBase64 = function(input)
         }
 
         output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) +
-        keyStr.charAt(enc3) + keyStr.charAt(enc4);
+            keyStr.charAt(enc3) + keyStr.charAt(enc4);
     } while (i < input.length);
 
     return output;
